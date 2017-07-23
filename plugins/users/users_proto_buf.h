@@ -98,7 +98,9 @@ class RegisterAccount {
         user_type_(NULL),
 	member_id_(NULL),
 	agentid_(NULL),
+	sub_agentid_(NULL),
 	recommend_(NULL),
+	channel_(NULL),
 	device_id_(NULL){
   }
 
@@ -136,6 +138,10 @@ class RegisterAccount {
       delete agentid_;
       agentid_ = NULL;
     }
+    if (sub_agentid_) {
+      delete sub_agentid_;
+      sub_agentid_ = NULL;
+    }
     if (recommend_) {
       delete recommend_;
       recommend_ = NULL;
@@ -143,6 +149,10 @@ class RegisterAccount {
     if (device_id_) {
       delete device_id_;
       device_id_= NULL;
+    }
+    if (channel_) {
+      delete channel_;
+      channel_ = NULL;
     }
   }
 
@@ -176,8 +186,14 @@ class RegisterAccount {
   void set_device_id(std::string& device_id) {
     device_id_ = new base_logic::StringValue(device_id);
   }
-  void set_member_id(int64 member_id) {
-    member_id_ = new base_logic::FundamentalValue(member_id);
+  void set_member_id(std::string& value) {
+    member_id_ = new base_logic::StringValue(value);
+  }
+  void set_sub_agentid(std::string& sub_agentid) {
+    sub_agentid_ = new base_logic::StringValue(sub_agentid);
+  }
+  void set_channel(std::string& value) {
+    channel_ = new base_logic::StringValue(value);
   }
   std::string verify_code() {
     std::string verify_code;
@@ -240,13 +256,18 @@ class RegisterAccount {
     return recommend;
   }
   
-  int64 member_id() {
-    int64 member_id;
+  std::string member_id() {
+    std::string member_id;
     if (member_id_)
-      member_id_->GetAsBigInteger(&member_id);
+      member_id_->GetAsString(&member_id);
     return member_id;
   }
-  
+  std::string channel() {
+    std::string tmp;
+    if (channel_)
+      channel_->GetAsString(&tmp);
+    return tmp;
+  }
  private:
   base_logic::StringValue* verify_code_;
   base_logic::FundamentalValue* timestamp_;
@@ -255,10 +276,13 @@ class RegisterAccount {
   base_logic::StringValue* phone_num_;
   base_logic::StringValue* passwd_;
   //modify bytw
-  base_logic::FundamentalValue* member_id_;
+ // base_logic::FundamentalValue* member_id_;
+  base_logic::StringValue* member_id_;
   base_logic::StringValue* agentid_;
+  base_logic::StringValue* sub_agentid_;
   base_logic::StringValue* recommend_;
   base_logic::StringValue* device_id_;
+  base_logic::StringValue* channel_;
 };
 
 class LoginAccount {
@@ -452,7 +476,9 @@ class WXBindAccount {
 	head_url_(NULL),
 	member_id_(NULL),
 	agentid_(NULL),
+	sub_agentid_(NULL),
 	recommend_(NULL),
+	channel_(NULL),
 	device_id_(NULL){ 
   }
 
@@ -499,6 +525,10 @@ class WXBindAccount {
       delete agentid_;
       agentid_ = NULL;
     }
+    if (sub_agentid_) {
+      delete sub_agentid_;
+      sub_agentid_ = NULL;
+    }
     if (recommend_) {
       delete recommend_;
       recommend_ = NULL;
@@ -506,6 +536,10 @@ class WXBindAccount {
     if (device_id_) {
       delete device_id_;
       device_id_= NULL;
+    }
+    if (channel_) {
+      delete channel_;
+      channel_= NULL;
     }
 
   }
@@ -546,16 +580,27 @@ class WXBindAccount {
   void set_agentid(std::string& agentid) {
     agentid_ = new base_logic::StringValue(agentid);
   }
+  void set_sub_agentid(std::string& sub_agentid) {
+    sub_agentid_ = new base_logic::StringValue(sub_agentid);
+  }
   void set_recommend(std::string& recommend) {
     recommend_ = new base_logic::StringValue(recommend);
   }
   void set_device_id(std::string& device_id) {
     device_id_ = new base_logic::StringValue(device_id);
   }
+  void set_channel(std::string& value) {
+    channel_ = new base_logic::StringValue(value);
+  }
+  /*
   void set_member_id(int64 member_id) {
     member_id_ = new base_logic::FundamentalValue(member_id);
   }
+  */
 
+  void set_member_id(std::string& value) {
+    member_id_ = new base_logic::StringValue(value);
+  }
   std::string verify_code() {
     std::string verify_code;
     if (verify_code_)
@@ -617,6 +662,12 @@ class WXBindAccount {
       agentid_->GetAsString(&agentid);
     return agentid;
   }
+  std::string sub_agentid() {
+    std::string sub_agentid;
+    if (sub_agentid_)
+      sub_agentid_->GetAsString(&sub_agentid);
+    return sub_agentid;
+  }
   std::string device_id() {
     std::string device_id;
     if (device_id_)
@@ -631,10 +682,16 @@ class WXBindAccount {
     return recommend;
   }
   
-  int64 member_id() {
-    int64 member_id;
+  std::string channel() {
+    std::string tmp;
+    if (channel_)
+      channel_->GetAsString(&tmp);
+    return tmp;
+  }
+  std::string member_id() {
+    std::string member_id;
     if (member_id_)
-      member_id_->GetAsBigInteger(&member_id);
+      member_id_->GetAsString(&member_id);
     return member_id;
   }
   
@@ -645,15 +702,17 @@ class WXBindAccount {
   //base_logic::StringValue* user_type_;
   base_logic::StringValue* phone_num_;
   base_logic::StringValue* passwd_;
-  //base_logic::FundamentalValue* member_id_;
   base_logic::StringValue* openid_;
   base_logic::StringValue* nick_name_;
   base_logic::StringValue* head_url_;
 //
-  base_logic::FundamentalValue* member_id_;
+  //base_logic::FundamentalValue* member_id_;
+  base_logic::StringValue* member_id_;
   base_logic::StringValue* agentid_;
+  base_logic::StringValue* sub_agentid_;
   base_logic::StringValue* recommend_;
   base_logic::StringValue* device_id_;
+  base_logic::StringValue* channel_;
 };
 
 
@@ -945,7 +1004,9 @@ class UserInfo {
 	agent_name_(NULL),
 	avatar_large_(NULL),
 	screen_name_(NULL),
-        value_(NULL) {
+	channel_(NULL),
+	starcode_(NULL),
+    value_(NULL) {
   }
 
   ~UserInfo() {
@@ -990,6 +1051,12 @@ class UserInfo {
    void set_avatar_large(const std::string& avatar_large) {
      avatar_large_ = new base_logic::StringValue(avatar_large);
    }
+   void set_channel(const std::string& value) {
+     channel_ = new base_logic::StringValue(value);
+   }
+   void set_starcode(const std::string& value) {
+     starcode_ = new base_logic::StringValue(value);
+   }
 
   base_logic::DictionaryValue* get() {
     value_ = new base_logic::DictionaryValue();
@@ -1014,6 +1081,10 @@ class UserInfo {
       value_->Set(L"avatar_Large", avatar_large_);
     if (screen_name_ != NULL)
       value_->Set(L"screenName", screen_name_);
+    if (channel_ != NULL)
+      value_->Set(L"channel", channel_);
+    if (starcode_ != NULL)
+      value_->Set(L"starcode", starcode_);
     return value_;
   }
 
@@ -1029,6 +1100,8 @@ class UserInfo {
   base_logic::StringValue* agent_name_;
   base_logic::StringValue* avatar_large_;
   base_logic::StringValue* screen_name_;
+  base_logic::StringValue* starcode_;
+  base_logic::StringValue* channel_;
 //end add bytw
   base_logic::DictionaryValue* value_;
 };
@@ -1038,7 +1111,8 @@ class LoginAccount {
   LoginAccount()
       : token_(NULL),
         userinfo_(NULL),
-        value_(NULL) {
+        value_(NULL),
+        token_time_(NULL) {
   }
 
   ~LoginAccount() {
@@ -1053,6 +1127,10 @@ class LoginAccount {
     token_ = new base_logic::StringValue(token);
   }
 
+  void set_token_time(const int64 token_time) {
+    token_time_ = new base_logic::FundamentalValue(token_time);
+  }
+
   void set_userinfo(base_logic::DictionaryValue* dict) {
     userinfo_ = dict;
   }
@@ -1062,6 +1140,8 @@ class LoginAccount {
 	base_logic::FundamentalValue* result = new base_logic::FundamentalValue(1);
     if (token_ != NULL)
       value_->Set(L"token", token_);
+    if (token_time_ != NULL)
+      value_->Set(L"token_time", token_time_);
 	value_->Set(L"result",result);
     if (userinfo_ != NULL)
       value_->Set(L"userinfo", userinfo_);
@@ -1071,6 +1151,7 @@ class LoginAccount {
  private:
   base_logic::DictionaryValue* userinfo_;
   base_logic::StringValue* token_;
+  base_logic::FundamentalValue* token_time_;
   base_logic::DictionaryValue* value_;
 };
 

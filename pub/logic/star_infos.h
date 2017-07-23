@@ -377,6 +377,9 @@ public:
     void set_deposit_name(const std::string& deposit_name) {
         data_->deposit_name_ = deposit_name;
     }
+    void set_transaction_id(const std::string& transaction_id) {
+        data_->transaction_id_ = transaction_id;
+    }
 
     void set_deposit_unix_time(const int64 unix_time) {
         data_->deposit_unix_time_ = unix_time;
@@ -417,6 +420,9 @@ public:
     const std::string& deposit_name() const {
         return data_->deposit_name_;
     }
+    const std::string& transaction_id() const {
+        return data_->transaction_id_;
+    }
     
     const int32 recharge_type() const {
         return data_->recharge_type_;
@@ -451,6 +457,7 @@ public:
         std::string deposit_time_;
         std::string deposit_name_;
         int32 recharge_type_;
+        std::string transaction_id_;
         void AddRef() {
             __sync_fetch_and_add(&refcount_, 1);
         }
@@ -497,11 +504,14 @@ public:
     const std::string& phone_num() const {
         return data_->phone_num_;
     }
-    const std::string nickname() const {
+    const std::string nickname() {
         return data_->nickname_;
     }
     const std::string& token() const {
         return data_->token_;
+    }
+    const int64 token_time() const {
+        return data_->token_time_;
     }
     const std::string& head_url() const {
         return data_->head_url_;
@@ -532,6 +542,12 @@ public:
     const std::string id_card() const {
         return data_->id_card_;
     }
+    const std::string starcode() const {
+        return data_->starcode_;
+    }
+    const std::string channel() const {
+        return data_->channel_;
+    }
 
     void set_type(const int32 type) {
         data_->type_ = type;
@@ -554,6 +570,9 @@ public:
     void set_token(const std::string& token) {
         data_->token_ = token;
     }
+    void set_token_time(const int64 token_time) {
+        data_->token_time_ = token_time;
+    }
     void set_head_url(const std::string& head_url) {
         data_->head_url_ = head_url;
     }
@@ -562,6 +581,12 @@ public:
     }
     void set_id_card(const std::string& value) {
         data_->id_card_ = value;
+    }
+    void set_channel(const std::string& value) {
+        data_->channel_ = value;
+    }
+    void set_starcode(const std::string& value) {
+        data_->starcode_ = value;
     }
 
     void set_balance(const double balance) {
@@ -608,6 +633,8 @@ public:
               send_error_count_(0) {
             real_name_ = "";
             id_card_ = "";
+            channel_ = "";
+            starcode_ = "";
         }
 
     public:
@@ -624,9 +651,12 @@ public:
         std::string phone_num_;
         std::string nickname_;
         std::string token_;
+        int64 token_time_;
         std::string head_url_;
         std::string real_name_;
         std::string id_card_;
+        std::string channel_;
+        std::string starcode_;
         double market_capitalization_;
         void AddRef() {
             __sync_fetch_and_add(&refcount_, 1);
@@ -782,6 +812,10 @@ public:
     void set_goods_key(const std::string& goods_key) {
         data_->goods_key_ = goods_key;
     }
+
+    void set_order_id(const int64 order_id) {
+        data_->order_id_ = order_id;
+    }
     const int64 uid() const {
         return data_->uid_;
     }
@@ -885,6 +919,10 @@ public:
         return data_->type_;
     }
 
+    const int64 order_id() const {
+        return data_->order_id_;
+    }
+
 private:
     class Data {
     public:
@@ -953,6 +991,7 @@ private:
         std::string symbol_;
         std::string name_;
         std::string goods_key_;
+        int64 order_id_;
 
         void AddRef() {
             __sync_fetch_and_add(&refcount_, 1);
@@ -989,6 +1028,11 @@ class TradesOrder {
     static bool open_after(const TradesOrder& t_trades_order,
                             const TradesOrder& r_trades_order) {
         return Data::open_after(t_trades_order.data_, r_trades_order.data_);
+    }
+    
+    static bool open_price_after(const TradesOrder& t_trades_order,
+                            const TradesOrder& r_trades_order) {
+        return Data::open_price_after(t_trades_order.data_, r_trades_order.data_);
     }
 
     static bool price_after(const TradesOrder& t_trades_order,
@@ -1180,6 +1224,10 @@ class TradesOrder {
 
         static bool open_after(const Data* t_data, const Data* r_data) {
             return t_data->open_position_time_ > r_data->open_position_time_;
+        }
+        
+        static bool open_price_after(const Data* t_data, const Data* r_data) {
+                return t_data->open_price_ >= r_data->open_price_ && t_data->open_position_time_ > r_data->open_position_time_;
         }
 
         static bool price_after(const Data* t_data, const Data* r_data){
@@ -1439,6 +1487,15 @@ public:
             data_->Release();
         }
     }
+    static bool sort_add_time(const StarInfo& t_info, const StarInfo& r_info) {
+        return Data::sort_add_time(t_info.data_, r_info.data_);
+    }
+
+    static bool sort_hot_priority(const StarInfo& t_info, const StarInfo& r_info) {
+        return Data::sort_hot_priority(t_info.data_, r_info.data_);
+    }
+
+
     const double updown() const {
         return data_->updown_;
     }
@@ -1491,6 +1548,27 @@ public:
 
     const std::string& jianpin() const {
         return data_->jianpin_;
+    }
+    const int32 display_on_home() const {
+        return data_->display_on_home_;
+    }
+    const int64 hot_priority1() const {
+        return data_->hot_priority1_;
+    }
+    const int64 hot_priority2() const {
+        return data_->hot_priority2_;
+    }
+    const std::string& home_pic() const {
+        return data_->home_pic_;
+    }
+    const std::string& home_button_pic() const {
+        return data_->home_button_pic_;
+    }
+    const int64 hot_add_time() const {
+        return data_->add_time_;
+    }
+    const int32 publish_type() const {
+        return data_->publish_type_;
     }
 //----
     void set_weibo_index_id(const std::string& weibo_index_id) {
@@ -1549,6 +1627,27 @@ public:
     void set_quanpin(const std::string& quanpin) {
         data_->quanpin_ = quanpin;
     }
+    void set_display_on_home(const int32 i) {
+        data_->display_on_home_ = i;
+    }
+    void set_hot_priority1(const int64 l) {
+        data_->hot_priority1_ = l;
+    }
+    void set_hot_priority2(const int64 l) {
+        data_->hot_priority2_ = l;
+    }
+    void set_home_pic(const std::string& pic) {
+        data_->home_pic_ = pic;
+    }
+    void set_home_button_pic(const std::string& pic) {
+        data_->home_button_pic_ = pic;
+    }
+    void set_add_time(const int64 l) {
+        data_->add_time_ = l;
+    }
+    void set_publish_type(const int32 i) {
+        data_->publish_type_ = i;
+    }
 
     void ValueSerialization(base_logic::DictionaryValue* dict);
 
@@ -1581,6 +1680,31 @@ public:
         std::string introduction_;//简介
         std::string jianpin_;
         std::string quanpin_;
+        int32 display_on_home_;//是否在主页显示 1-显示
+        int64 hot_priority1_;//热度优先级1
+        int64 hot_priority2_;//热度优先级2
+        std::string home_pic_;//主页大图
+        std::string home_button_pic_;//主页底部图片
+        int64 add_time_;//创建时间
+        int32 publish_type_;//0-预售 1-发售 2-流通
+
+        static bool sort_add_time(const Data* t_info, const Data* r_info) {
+            if (t_info == NULL || r_info == NULL)
+                return false;
+            return t_info->add_time_ > r_info->add_time_;
+        }
+        static bool sort_hot_priority(const Data* t_info, const Data* r_info) {
+            if (t_info == NULL || r_info == NULL)
+                return false;
+            if(t_info->hot_priority1_ > r_info->hot_priority1_){
+                return true;
+            }else if(t_info->hot_priority1_ < r_info->hot_priority1_){
+                return false;
+            }else{
+                return t_info->hot_priority2_ > r_info->hot_priority2_;
+            }
+        }
+
         void AddRef() {
             __sync_fetch_and_add(&refcount_, 1);
         }
@@ -1982,6 +2106,7 @@ class StarBrief {
   };
   Data* data_;
 };
+
 }  // namespace quotations_logic
 
 #endif /* QUOTATIONS_PUB_LOGIC_QUOTATIONS_INFOS_H_ */

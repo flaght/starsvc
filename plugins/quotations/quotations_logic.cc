@@ -105,6 +105,10 @@ bool Quotationslogic::OnQuotationsMessage(struct server *srv, const int socket,
         OnSymbolList(srv, socket ,packet);
         break;
       }
+      case R_HOME_SYMBOL_LIST: {
+        OnHomeSymbolList(srv, socket ,packet);
+        break;
+      }
       default:
         break;
     }
@@ -164,6 +168,29 @@ bool Quotationslogic::OnTimeout(struct server *srv, char *id, int opcode,
       break;
   }
   return true;
+}
+
+bool Quotationslogic::OnHomeSymbolList(struct server* srv, int socket,
+                                       struct PacketHead* packet) {
+
+  if (packet->packet_length <= PACKET_HEAD_LENGTH) {
+    send_error(socket, ERROR_TYPE, FORMAT_ERRNO, packet->session_id);
+    return false;
+  }
+  struct PacketControl* packet_control = (struct PacketControl*) (packet);
+
+  int64 uid, atype;
+  std::string token, symbol;
+  bool r1 = packet_control->body_->GetBigInteger(L"id", &uid);
+  bool r2 = packet_control->body_->GetString(L"token", &token);
+  bool r3 = packet_control->body_->GetBigInteger(L"aType", &atype);
+  if (!r1 || !r2 || !r3){
+    send_error(socket, ERROR_TYPE, FORMAT_ERRNO, packet->session_id);
+    return false;
+  }
+
+  quotations_logic::QuotationsEngine::GetSchdulerManager()->SendHomeSymbolList(
+    socket, packet->session_id,packet->reserved,atype);
 }
 
 bool Quotationslogic::OnSymbolList(struct server* srv, int socket,

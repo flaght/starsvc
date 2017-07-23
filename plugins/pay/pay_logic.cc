@@ -136,9 +136,16 @@ try
       //OnCertification(srv, socket, packet);
       break;
     }
-     case R_CHECK_PAY_PWD: {
+    case R_CHECK_PAY_PWD: {
       OnCheckPayPwd(srv, socket, packet);
       break;
+    }
+    case R_CANCLE_PAY: {
+      OnCanclePay(srv, socket, packet);
+      break;
+    }
+    case R_UNION_WITHDRAW: {
+      OnUnionWithDraw(srv, socket, packet);
     }
     default:
       break;
@@ -294,9 +301,15 @@ bool Paylogic::OnCertification(struct server* srv, int socket,
   base_logic::DictionaryValue dic;
   dic.SetString(L"cardNo", idcard);
   dic.SetString(L"realName", name);
+  base_http::HttpRequestHeader *httphead = new base_http::HttpRequestHeader();
+  httphead->AddHeaderFromString(strHeader);
   //base_http::HttpAPI::RequestGetMethod(strUrl, &dic, strResult, strHeader, 1);
-  base_http::HttpAPI::RequestGetMethod(strUrl, &dic, strResult, strHeader, 1);
+  base_http::HttpAPI::RequestGetMethod(strUrl, &dic, httphead, strResult, 1);
   LOG_DEBUG2("strResult [%s]___________________________________________________", strResult.c_str());
+  if(httphead){
+    delete httphead;
+    httphead = NULL;
+  }
 
   //pay_logic::net_reply::TResult r_ret;;
   //r_ret.set_result(1);
@@ -452,10 +465,17 @@ bool Paylogic::OnCheckPayPwd(struct server* srv, int socket, struct PacketHead* 
     send_error(socket, ERROR_TYPE, FORMAT_ERRNO, packet->session_id);
     return false;
   }
+
+  star_logic::UserInfo userinfo;
+  if (!schduler_engine_->GetUserInfoSchduler(uid, &userinfo)){
+    LOG_DEBUG2("uid[%ld]", uid);
+    send_error(socket, ERROR_TYPE, NO_CHECK_TOKEN_ERRNO, packet->session_id);
+    return false;
+  }
+
   //check token
-  r1 = logic::SomeUtils::VerifyToken(uid, token);
-  if (!r1) {
-    LOG_DEBUG2("packet_length %d",packet->packet_length);
+  if (token != userinfo.token()) {
+    LOG_DEBUG2("check token[%s],userinfo token[%s]", token.c_str(), userinfo.token().c_str());
     send_error(socket, ERROR_TYPE, NO_CHECK_TOKEN_ERRNO, packet->session_id);
     return false;
   }
@@ -480,7 +500,58 @@ bool Paylogic::OnCheckPayPwd(struct server* srv, int socket, struct PacketHead* 
   return true;
 }
 //
+
+bool Paylogic::OnCanclePay(struct server* srv, int socket,
+                            struct PacketHead *packet) {
+  pay_logic::net_request::CanclePay cancle_pay;
+  if (packet->packet_length <= PACKET_HEAD_LENGTH) {
+    send_error(socket, ERROR_TYPE, FORMAT_ERRNO, packet->session_id);
+    return false;
+  }
+  struct PacketControl* packet_control = (struct PacketControl*) (packet);
+  bool r = cancle_pay.set_http_packet(packet_control->body_);
+  if (!r) {
+    LOG_DEBUG2("packet_length %d",packet->packet_length);
+    send_error(socket, ERROR_TYPE, FORMAT_ERRNO, packet->session_id);
+    return false;
+  }
+
+  pay_logic::PayEngine::GetSchdulerManager()->OnCanclePay(
+      socket, cancle_pay.uid(), cancle_pay.rid());
+
+  return true;
+}
 //
 //
-//
+
+bool Paylogic::OnUnionWithDraw(struct server* srv, int socket,
+                            struct PacketHead *packet) {
+  pay_logic::net_request::UnionWithDraw union_withdraw;
+  if (packet->packet_length <= PACKET_HEAD_LENGTH) {
+    send_error(socket, ERROR_TYPE, FORMAT_ERRNO, packet->session_id);
+    return false;
+  }
+  struct PacketControl* packet_control = (struct PacketControl*) (packet);
+  bool r = union_withdraw.set_http_packet(packet_control->body_);
+  if (!r) {
+    LOG_DEBUG2("packet_length %d",packet->packet_length);
+    send_error(socket, ERROR_TYPE, FORMAT_ERRNO, packet->session_id);
+    return false;
+  }
+
+
+  //创建取现订单号
+  //
+  int64 rid = base::SysRadom::GetInstance()->GetRandomID();
+  r = pay_logic::PayEngine::GetSchdulerManager()->UnionWithDraw(
+      socket, union_withdraw.uid(), rid, union_withdraw.price(), packet->session_id);
+  
+  if (!r)
+  {
+    send_error(socket, ERROR_TYPE, UNIWITHDRAW_ERROR, packet->session_id);
+    return false;
+  }
+  return true;
+}
+
 }  // namespace trades_logic

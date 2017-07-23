@@ -78,15 +78,27 @@ bool RegisterAccount::set_http_packet(base_logic::DictionaryValue* value) {
   //add bytw
   std::string tmp;
   int64 tmp_64;
+  /*
   r = value->GetBigInteger(L"memberId", &tmp_64);
   if (r)
     set_member_id(tmp_64);
+  else
+    return false;
+    */
+  r = value->GetString(L"memberId", &tmp);
+  if (r)
+    set_member_id(tmp);
   else
     return false;
 
   r = value->GetString(L"agentId", &tmp);
   if (r)
     set_agentid(tmp);
+  else
+    return false;
+  r = value->GetString(L"sub_agentId", &tmp);
+  if (r)
+    set_sub_agentid(tmp);
   else
     return false;
 
@@ -98,6 +110,11 @@ bool RegisterAccount::set_http_packet(base_logic::DictionaryValue* value) {
   r = value->GetString(L"deviceId", &tmp);
   if (r)
     set_device_id(tmp);
+  else
+    return false;
+  r = value->GetString(L"channel", &tmp);
+  if (r)
+    set_channel(tmp);
   else
     return false;
   //end 
@@ -259,9 +276,16 @@ bool WXBindAccount::set_http_packet(base_logic::DictionaryValue* value) {
     return false;
 
   int64 tmp_64;
+  /*
   r = value->GetBigInteger(L"memberId", &tmp_64);
   if (r)
     set_member_id(tmp_64);
+  else
+    return false;
+    */
+  r = value->GetString(L"memberId", &tmp);
+  if (r)
+    set_member_id(tmp);
   else
     return false;
 
@@ -279,6 +303,16 @@ bool WXBindAccount::set_http_packet(base_logic::DictionaryValue* value) {
   r = value->GetString(L"deviceId", &tmp);
   if (r)
     set_device_id(tmp);
+  else
+    return false;
+  r = value->GetString(L"sub_agentId", &tmp);
+  if (r)
+    set_sub_agentid(tmp);
+  else
+    return false;
+  r = value->GetString(L"channel", &tmp);
+  if (r)
+    set_channel(tmp);
   else
     return false;
   //end 

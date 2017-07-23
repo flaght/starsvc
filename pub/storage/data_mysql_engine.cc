@@ -21,16 +21,19 @@ bool DataMYSQLEngine::WriteData(const int32 type, base_logic::Value* value) {
     return r;
   }
   base_storage::DBStorageEngine* engine = db_pool_.DBConnectionPop();
-  if (engine == NULL) {
-    LOG_ERROR("GetConnection Error");
-    return false;
-  }
-  engine->FreeRes();
-  r = engine->SQLExec(sql.c_str());
-  if (!r) {
-    LOG_ERROR("exec sql error");
-    return false;
-  }
+  do
+  {
+      if (engine == NULL) {
+        LOG_ERROR("GetConnection Error");
+        break;
+      }
+      engine->FreeRes();
+      r = engine->SQLExec(sql.c_str());
+      if (!r) {
+          LOG_ERROR("exec sql error");
+          break;
+      }
+  } while (0);
 
   // engine->Release();
   db_pool_.DBConnectionPush(engine);

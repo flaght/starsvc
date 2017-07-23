@@ -41,6 +41,8 @@ TradesKafka::~TradesKafka() {
 }
 
 bool TradesKafka::SetTradesPosition(star_logic::TradesPosition& position) {
+
+LOG_DEBUG2("position ________________________________________ %ld, %d", position.position_id(), position.handle());
     int re = PUSH_DATA_SUCCESS; 
     base_logic::DictionaryValue* task_info = position.GetValue();
     re = kafka_producer_.PushData(task_info);

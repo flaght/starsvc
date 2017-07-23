@@ -65,6 +65,9 @@ void UserInfo::ValueSerialization(base_logic::DictionaryValue* dict) {
   dict->GetInteger(L"gender", &data_->gender_);
   dict->GetString(L"nickname", &data_->nickname_);
   dict->GetString(L"head_url", &data_->head_url_);
+  dict->GetString(L"channel", &data_->channel_);
+  dict->GetString(L"starcode", &data_->starcode_);
+  dict->GetBigInteger(L"token_time", &data_->token_time_);
 }
 
 
@@ -144,6 +147,8 @@ void Recharge::ValueSerialization(base_logic::DictionaryValue* dict) {
         data_->status_ = 1;
     else if (status == 3)
         data_->status_ = 2;
+    else if (status == 4)
+        data_->status_ = 4;
     else
         data_->status_ = 2;
 
@@ -155,9 +160,12 @@ void Recharge::ValueSerialization(base_logic::DictionaryValue* dict) {
         data_->deposit_name_ = "微信";
     else if (data_->deposit_type_ == 2)
         data_->deposit_name_ = "银联";
+    else if (data_->deposit_type_ == 3)
+        data_->deposit_name_ = "支付宝";
     else
         data_->deposit_name_ = "未知";
     dict->GetInteger(L"recharge_type", &data_->recharge_type_);
+    dict->GetString(L"transaction_id", &data_->transaction_id_);
 }
 
 TradesOrder::TradesOrder() {
@@ -494,6 +502,13 @@ void StarInfo::ValueSerialization(base_logic::DictionaryValue* dict) {
     dict->GetString(L"introduction", &data_->introduction_);
     dict->GetString(L"jianpin", &data_->jianpin_);
     dict->GetString(L"quanpin", &data_->quanpin_);
+    dict->GetInteger(L"display_on_home", &data_->display_on_home_);
+    dict->GetBigInteger(L"hot_priority1", &data_->hot_priority1_);
+    dict->GetBigInteger(L"hot_priority2", &data_->hot_priority2_);
+    dict->GetString(L"pic1", &data_->home_pic_);
+    dict->GetString(L"home_button_pic", &data_->home_button_pic_);
+    dict->GetBigInteger(L"add_time", &data_->add_time_);
+    dict->GetInteger(L"publish_type", &data_->publish_type_);
 }
 ///TOwnStar
 
@@ -650,5 +665,6 @@ void StarBrief::ValueSerialization(base_logic::DictionaryValue* dict) {
   dict->GetString(L"pic_url", &data_->pic_url_);
   dict->GetBigInteger(L"owntimes", &data_->owntimes_);
 }
+
 
 }  // namespace quotations_logic
